@@ -12,7 +12,7 @@ const ChatInterface: React.FC<Props> = ({ report, onClose }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'model',
-      text: `Hello! I've analyzed ${report.targetUrl}. I found ${report.sections.reduce((acc, s) => acc + s.weaknesses.length, 0)} issues. Ask me how to fix any of them!`,
+      text: `Hello! I've analyzed ${report.targetUrl}. I found ${report.sections.reduce((acc, s) => acc + s.findings.length, 0)} issues. Ask me how to fix any of them!`,
       timestamp: new Date()
     }
   ]);

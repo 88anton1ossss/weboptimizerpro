@@ -13,7 +13,6 @@ import {
   MessageSquare,
   Zap,
   Layout,
-  BarChart3,
   Globe,
   TrendingUp,
   X,
@@ -23,7 +22,9 @@ import {
   Hash,
   CloudLightning,
   Lightbulb,
-  FileText
+  CalendarCheck,
+  ArrowRight,
+  Target
 } from 'lucide-react';
 
 export default function App() {
@@ -247,19 +248,23 @@ export default function App() {
 
                   {/* Summary & Metrics */}
                   <div className="lg:col-span-9 flex flex-col gap-6">
-                    {/* Top Row Stats (Simulated) */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {[
-                            { label: "Est. Load Time", val: "~1.2s", color: "text-green-600" },
-                            { label: "Mobile Score", val: "88/100", color: "text-blue-600" },
-                            { label: "Organic KW", val: "Detected", color: "text-purple-600" },
-                            { label: "Security", val: "Standard", color: "text-cyan-600" },
-                        ].map((stat, i) => (
-                            <div key={i} className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col shadow-sm">
-                                <span className="text-xs text-slate-500 font-medium uppercase">{stat.label}</span>
-                                <span className={`text-xl font-bold ${stat.color} mt-1`}>{stat.val}</span>
-                            </div>
-                        ))}
+                    {/* ROI & Projections Row */}
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-16 h-16 bg-green-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+                            <span className="text-xs text-slate-500 font-medium uppercase z-10 relative">Est. Traffic Gain</span>
+                            <span className="text-2xl font-bold text-green-600 mt-2 z-10 relative">{report.roiEstimate.trafficGain}</span>
+                        </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+                            <span className="text-xs text-slate-500 font-medium uppercase z-10 relative">Est. Lead Increase</span>
+                            <span className="text-2xl font-bold text-blue-600 mt-2 z-10 relative">{report.roiEstimate.leadIncrease}</span>
+                        </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-16 h-16 bg-purple-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+                            <span className="text-xs text-slate-500 font-medium uppercase z-10 relative">Revenue Projection</span>
+                            <span className="text-2xl font-bold text-purple-600 mt-2 z-10 relative">{report.roiEstimate.revenueProjection}</span>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
@@ -270,17 +275,11 @@ export default function App() {
                             <p className="text-slate-600 leading-relaxed text-sm flex-1">
                                 {report.executiveSummary}
                             </p>
-                            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl">
-                                <h4 className="text-blue-700 font-bold text-xs uppercase mb-1 flex items-center gap-2">
-                                    <TrendingUp className="w-3 h-3" /> Projected Impact
-                                </h4>
-                                <p className="text-slate-700 font-medium text-sm">{report.businessImpact}</p>
-                            </div>
                         </div>
 
                         <div className="glass-panel rounded-3xl p-8 bg-white">
                            <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                             <Zap className="w-5 h-5 text-amber-500" /> High Priority Wins
+                             <Zap className="w-5 h-5 text-amber-500" /> Quick Wins
                            </h3>
                            <ul className="space-y-4">
                              {report.quickWins.map((win, i) => (
@@ -326,7 +325,19 @@ export default function App() {
                       <Tag className="w-4 h-4 opacity-50 group-hover:opacity-100" />
                     </button>
 
-                    <div className="pl-2 space-y-1">
+                    <button 
+                      onClick={() => setActiveTab('roadmap')}
+                      className={`w-full text-left px-5 py-4 rounded-xl flex items-center justify-between transition-all group ${
+                        activeTab === 'roadmap' 
+                            ? 'bg-green-50 text-green-600 border border-green-200 shadow-sm' 
+                            : 'bg-white border border-slate-200 text-slate-500 hover:border-green-200 hover:text-green-600'
+                      }`}
+                    >
+                      <span className="font-bold">Action Plan</span>
+                      <CalendarCheck className="w-4 h-4 opacity-50 group-hover:opacity-100" />
+                    </button>
+
+                    <div className="pl-2 space-y-1 mt-6">
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 py-2">Audit Modules</p>
                         {report.sections.map((section) => (
                         <button
@@ -453,8 +464,53 @@ export default function App() {
                         </div>
                     )}
 
+                    {activeTab === 'roadmap' && (
+                        <div className="animate-slideUp space-y-8">
+                             <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                                <div className="mb-8">
+                                    <h3 className="text-2xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                                        <CalendarCheck className="w-6 h-6 text-green-600" /> 
+                                        4-Week Implementation Plan
+                                    </h3>
+                                    <p className="text-slate-500">Step-by-step roadmap to execute the recommendations.</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-6">
+                                    {report.implementationPlan.map((step, idx) => (
+                                        <div key={idx} className="relative flex gap-6 group">
+                                            {/* Timeline Connector */}
+                                            {idx !== report.implementationPlan.length - 1 && (
+                                                <div className="absolute left-6 top-12 bottom-0 w-0.5 bg-slate-100 group-hover:bg-green-100 transition-colors"></div>
+                                            )}
+                                            
+                                            {/* Week Badge */}
+                                            <div className="flex-none w-12 h-12 rounded-full bg-green-50 border border-green-200 text-green-700 flex items-center justify-center font-bold shadow-sm z-10">
+                                                {step.week}
+                                            </div>
+
+                                            {/* Content Card */}
+                                            <div className="flex-1 bg-white border border-slate-200 rounded-2xl p-6 hover:border-green-300 hover:shadow-md transition-all">
+                                                <h4 className="text-lg font-bold text-slate-900 mb-2">{step.focus}</h4>
+                                                <ul className="space-y-3">
+                                                    {step.tasks.map((task, tIdx) => (
+                                                        <li key={tIdx} className="flex items-start gap-3 text-slate-600 text-sm">
+                                                            <div className="mt-1 w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center shrink-0">
+                                                                <div className="w-2 h-2 rounded-full bg-transparent group-hover:bg-green-500 transition-colors"></div>
+                                                            </div>
+                                                            {task}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                             </div>
+                        </div>
+                    )}
+
                     {/* Individual Sections (Fallback for direct clicks) */}
-                    {activeTab !== 'overview' && activeTab !== 'keywords' && (
+                    {activeTab !== 'overview' && activeTab !== 'keywords' && activeTab !== 'roadmap' && (
                       <div className="space-y-6 animate-fadeIn">
                          {report.sections.filter(s => s.id === activeTab).map(section => (
                            <AuditSectionDetails key={section.id} section={section} />

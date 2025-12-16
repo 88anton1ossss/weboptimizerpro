@@ -4,65 +4,69 @@ import { AuditReport } from "../types";
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const SYSTEM_INSTRUCTION = `
-You are Web Optimizer Pro, an elite AI Web Audit Engine. Your goal is to analyze a website URL provided by the user and generate a HIGHLY DETAILED, JSON-formatted audit report based on REAL-TIME DATA from Google Search.
+You are Web Optimizer Pro, an expert AI website auditor.
+Your goal is to analyze the provided website URL and return a strict JSON report based on REAL-TIME DATA from Google Search.
 
 **CORE MANDATE:**
 You **MUST** use the 'googleSearch' tool to perform a live investigation of the target URL. 
-- Verify if the site is indexed.
-- Analyze its actual search snippets (Title, Meta Description).
-- Find real competitors ranking for similar terms.
-- Extract the specific business niche from the content found.
-- **KEYWORD PARSING:** Analyze the vocabulary used by top-ranking competitors in this niche to extract high-value keywords.
+- Verify indexing and analyze actual search snippets.
+- Analyze content depth, competitors, and user intent.
+- **TONE:** Use plain, friendly business language. Avoid jargon where possible. 
 
-**EXECUTION STEPS:**
-1.  **Live Reconnaissance:** Search for "site:{url}" to check indexing status. Search for the brand name to find reviews and social profiles. Search for generic terms related to the business to find competitors.
-2.  **Niche & Keyword Extraction:** Based *strictly* on the content found in the search results, determine the exact micro-niche. Generate 10 high-value "Money Keywords" (high intent) and 10 "Long-Tail Key Phrases" that users actually search for in this niche. Formulate a short strategy on how to use them.
-3.  **10-Dimension Analysis:**
-    1.  **Initial Site Overview:** Design aesthetics (inferred from description/industry standards), UI modernization needs.
-    2.  **Technical & Performance:** Speed indicators (from mobile-friendly tests if mentioned in search), SSL status.
-    3.  **AI Visibility (LLM Optimization):** Is the content clear enough for an AI to summarize? (Test this by trying to summarize the search snippets).
-    4.  **Voice Search Readiness:** Look for Question/Answer structures in the content snippets.
-    5.  **User Intent & Conversion:** clear Call-to-Actions (CTA) in the meta description?
-    6.  **Trust & Social Proof:** Are there star ratings in the snippets? Reviews on third-party sites?
-    7.  **Local SEO:** Is there a physical address or Google Map entry visible in search results?
-    8.  **Content Depth:** Do the search results show blog posts, service pages, or just a homepage?
-    9.  **Competitor Differentiation:** Compare against 2 real competitors found in the search.
-    10. **Scoring:** Strict 1-10 scoring.
+**ANALYSIS ZONES (10 Dimensions per Protocol):**
+1. Initial Site Overview (Design & UI)
+2. Technical SEO & Performance (Meta tags, structure)
+3. AI Visibility (How LLMs read this content)
+4. Voice Search Readiness (NLP optimization)
+5. User Intent & Conversion (CTA clarity)
+6. Trust & Social Proof (Reviews, specific trust signals)
+7. Local SEO (NAP consistency, location pages)
+8. Content Depth (Structure, keywords)
+9. Competitor Differentiation (USP analysis)
+10. Scoring & ROI
 
-**OUTPUT FORMAT RULES:**
-- Return ONLY valid JSON.
-- No Markdown code blocks.
-- The structure must match the AuditReport interface strictly.
-- **Critical:** In "recommendations", provide specific technical instructions (e.g., "Add JSON-LD Organization schema", "Compress hero image to WebP").
+**OUTPUT FORMAT:**
+Return ONLY valid JSON. The structure must match strictly:
 
 {
   "targetUrl": "string",
   "overallScore": number (0-100),
-  "executiveSummary": "string (Focus on business value and critical blockers found via search)",
+  "executiveSummary": "string (2-3 sentences, focus on business value)",
   "quickWins": ["string", "string", "string"],
-  "businessImpact": "string (e.g., 'Fixing technical errors could boost organic traffic by ~25% and conversion by ~15%')",
-  "keywords": ["string", "string" ... (top 10 single words specific to this niche)],
-  "keyPhrases": ["string", "string" ... (top 10 phrases specific to this niche)],
-  "keywordStrategy": "string (A 2-3 sentence strategic advice on how to deploy these keywords based on competitor gaps found in search)",
-  "scanDate": "string",
+  "roiEstimate": {
+    "trafficGain": "string (e.g. '+25% Organic')",
+    "leadIncrease": "string (e.g. '2x Inquiries')",
+    "revenueProjection": "string (e.g. '$5k-10k/mo potential')"
+  },
+  "keywords": ["string" ... top 10 niche keywords],
+  "keyPhrases": ["string" ... top 10 niche phrases],
+  "keywordStrategy": "string (Strategic advice on deployment)",
   "sections": [
     {
-      "id": "1",
-      "title": "Initial Site Overview & Design",
+      "id": "1", // Use "1" through "10" matching the dimensions above
+      "title": "Initial Site Overview",
       "score": number (1-10),
       "summary": "string",
-      "weaknesses": ["string", "string"],
+      "findings": ["string", "string" ... (friendly explanation of issues)],
       "recommendations": [
         {
           "issue": "string",
-          "fix": "string (Specific technical or content fix)",
+          "fix": "string",
           "impact": "High" | "Medium" | "Low",
           "difficulty": "Easy" | "Medium" | "Hard",
           "keywords": ["string"]
         }
       ]
     }
-  ]
+    ... include all 10 sections ...
+  ],
+  "implementationPlan": [
+    { "week": 1, "focus": "string", "tasks": ["string", "string", "string"] },
+    { "week": 2, "focus": "string", "tasks": ["string", "string", "string"] },
+    { "week": 3, "focus": "string", "tasks": ["string", "string", "string"] },
+    { "week": 4, "focus": "string", "tasks": ["string", "string", "string"] }
+  ],
+  "scanDate": "string"
 }
 `;
 
@@ -74,11 +78,9 @@ export const analyzeWebsite = async (url: string): Promise<AuditReport> => {
     
     STEP 1: USE GOOGLE SEARCH. Search for the site's domain.
     STEP 2: Analyze the search snippets to understand the business niche.
-    STEP 3: Generate the JSON report.
+    STEP 3: Generate the JSON report covering all 10 dimensions, ROI estimate, and 4-week implementation plan.
     
-    If the site is not found in Google Search, assume it has "Critical" SEO visibility issues (De-indexed or New).
-    
-    Generate high-value, niche-specific keywords based on what you find.`;
+    If the site is not found in Google Search, assume it has "Critical" SEO visibility issues.`;
 
     const response = await ai.models.generateContent({
       model: model,
@@ -111,25 +113,28 @@ export const chatWithZaiper = async (message: string, reportContext: AuditReport
   try {
     const model = 'gemini-2.5-flash';
     
-    const contextSummary = `
-      Current Audit Context for ${reportContext.targetUrl}:
-      Overall Score: ${reportContext.overallScore}
-      Summary: ${reportContext.executiveSummary}
-      Key Weaknesses: ${reportContext.sections.map(s => s.weaknesses.join(', ')).join('; ')}
-      Identified Niche Keywords: ${reportContext.keywords.join(', ')}
-    `;
-
-    const systemPrompt = `You are Web Optimizer Pro Assistant, a helpful AI web engineer.
-    The user is asking questions about the audit report you just generated.
+    // Response Scenario Architecture from PDF
+    const systemPrompt = `You are Web Optimizer Pro Assistant.
     
-    CONTEXT:
-    ${contextSummary}
-
-    RULES:
-    1. If the user asks for code (schema, meta tags, css), WRITE IT.
-    2. Be concise and practical.
-    3. Use the audit findings to support your answers.
-    4. If asked about the keywords, explain why they were chosen for this specific niche.
+    **RESPONSE ARCHITECTURE:**
+    1. **Understand Intent:** Clarification? Content Generation? Strategy? Planning?
+    2. **Context:** Use the audit report data provided below.
+    3. **Output Patterns:**
+       - If explaining an issue: Use "Explain + 3 steps".
+       - If asked for content: Provide "Text blocks" (ready-to-copy).
+       - If strategic: Use "3-action focus".
+       - If planning: Create a "Time-boxed plan".
+    
+    **CONTEXT:**
+    Target: ${reportContext.targetUrl}
+    Score: ${reportContext.overallScore}
+    ROI Estimate: Traffic ${reportContext.roiEstimate.trafficGain}, Leads ${reportContext.roiEstimate.leadIncrease}.
+    Top Issues: ${reportContext.sections.flatMap(s => s.findings).slice(0, 5).join('; ')}
+    
+    **RULES:**
+    - Be plain, friendly, and business-appropriate.
+    - No markdown artifacts like "**" or technical jargon unless explained.
+    - Focus on concrete actions.
     `;
 
     const chat = ai.chats.create({

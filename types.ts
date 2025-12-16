@@ -6,12 +6,24 @@ export interface Recommendation {
   keywords?: string[];
 }
 
+export interface RoiEstimate {
+  trafficGain: string;
+  leadIncrease: string;
+  revenueProjection: string;
+}
+
+export interface ImplementationStep {
+  week: number;
+  focus: string;
+  tasks: string[];
+}
+
 export interface AuditSection {
   id: string;
   title: string;
   score: number;
   summary: string;
-  weaknesses: string[];
+  findings: string[]; // Renamed from weaknesses for friendly tone
   recommendations: Recommendation[];
 }
 
@@ -20,15 +32,15 @@ export interface AuditReport {
   overallScore: number;
   executiveSummary: string;
   quickWins: string[];
-  businessImpact: string;
-  keywords: string[]; // Top 10 niche keywords
-  keyPhrases: string[]; // Top 10 niche phrases
-  keywordStrategy: string; // Strategic advice on how to use these keywords
+  roiEstimate: RoiEstimate; // Added per PDF
+  implementationPlan: ImplementationStep[]; // Added per PDF
+  keywords: string[]; 
+  keyPhrases: string[]; 
+  keywordStrategy: string; 
   sections: AuditSection[];
   scanDate: string;
 }
 
-// Changed from enum to const object to avoid potential syntax errors during runtime parsing
 export const AppState = {
   IDLE: 'IDLE',
   SCANNING: 'SCANNING',

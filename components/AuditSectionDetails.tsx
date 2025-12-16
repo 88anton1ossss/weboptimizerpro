@@ -1,6 +1,6 @@
 import React from 'react';
 import { AuditSection } from '../types';
-import { AlertTriangle, Hammer, Search, ArrowRight, Zap } from 'lucide-react';
+import { AlertTriangle, Hammer, Search, Zap } from 'lucide-react';
 
 interface Props {
   section: AuditSection;
@@ -30,17 +30,17 @@ const AuditSectionDetails: React.FC<Props> = ({ section }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Weaknesses */}
-        <div className="bg-red-50 rounded-xl p-6 border border-red-100">
-          <h4 className="text-xs font-bold text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2">
-            <Zap className="w-4 h-4" />
-            Detected Weaknesses
+        {/* Audit Findings (Previously Weaknesses) */}
+        <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+          <h4 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <Zap className="w-4 h-4 text-amber-500" />
+            Audit Findings
           </h4>
           <ul className="space-y-3">
-            {section.weaknesses.map((weakness, idx) => (
+            {section.findings.map((finding, idx) => (
               <li key={idx} className="flex items-start gap-3 text-slate-700 text-sm">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                {weakness}
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                {finding}
               </li>
             ))}
           </ul>
