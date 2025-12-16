@@ -41,6 +41,12 @@ export interface AuditReport {
   scanDate: string;
 }
 
+export interface GoogleAd {
+  headlines: string[];
+  descriptions: string[];
+  keywords: string[];
+}
+
 export const AppState = {
   IDLE: 'IDLE',
   SCANNING: 'SCANNING',

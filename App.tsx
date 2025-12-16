@@ -5,6 +5,7 @@ import ScannerEffect from './components/ScannerEffect';
 import AuditSectionDetails from './components/AuditSectionDetails';
 import RadialScore from './components/RadialScore';
 import ChatInterface from './components/ChatInterface';
+import AdGenerator from './components/AdGenerator';
 import { 
   ShieldCheck, 
   Search, 
@@ -24,7 +25,12 @@ import {
   Lightbulb,
   CalendarCheck,
   ArrowRight,
-  Target
+  Target,
+  Megaphone,
+  Download,
+  FileText,
+  RotateCcw,
+  Printer
 } from 'lucide-react';
 
 export default function App() {
@@ -54,10 +60,11 @@ export default function App() {
       const result = await analyzeWebsite(formattedUrl);
       setReport(result);
       setAppState(AppState.COMPLETE);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setAppState(AppState.ERROR);
-      setErrorMsg("Unable to connect to target. Please ensure the URL is publicly accessible.");
+      // Use the actual error message
+      setErrorMsg(err.message || "Unable to connect to target. Please ensure the URL is publicly accessible.");
     }
   }, [url]);
 
@@ -67,6 +74,29 @@ export default function App() {
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
       }
+  };
+
+  const handleDownloadJson = () => {
+    if (report) {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(report, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", `audit_report_${new URL(report.targetUrl).hostname}.json`);
+      document.body.appendChild(downloadAnchorNode); // required for firefox
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleReset = () => {
+      setAppState(AppState.IDLE);
+      setReport(null);
+      setUrl('');
+      setActiveTab('overview');
   };
 
   const handleCopyKeywords = () => {
@@ -82,9 +112,9 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 text-slate-800 selection:bg-blue-200 flex flex-col font-sans">
       
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50 print:hidden">
         <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setAppState(AppState.IDLE); setReport(null); }}>
+          <div className="flex items-center gap-3 cursor-pointer" onClick={handleReset}>
             <div className="relative">
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-blue-600 rounded-lg blur opacity-50"></div>
                 <div className="relative w-9 h-9 bg-white rounded-lg flex items-center justify-center border border-slate-200 shadow-sm">
@@ -97,24 +127,39 @@ export default function App() {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
              {appState === AppState.COMPLETE && (
                 <>
-                  <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full border border-blue-100 text-xs font-bold">
-                    <Search className="w-3 h-3" />
-                    Verified by Google Search
-                  </div>
-                  <button
-                    onClick={handleCopy}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
-                        copied
-                         ? 'bg-green-100 border-green-200 text-green-700'
-                         : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400 hover:text-slate-900'
-                    }`}
+                  <button 
+                    onClick={handleReset}
+                    className="hidden md:flex items-center gap-2 px-3 py-2 text-slate-500 hover:text-slate-900 font-medium text-sm hover:bg-slate-100 rounded-lg transition-all"
                   >
-                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                      <span className="text-sm font-medium">{copied ? 'Copied' : 'Copy JSON'}</span>
+                    <RotateCcw className="w-4 h-4" /> New Scan
                   </button>
+
+                  <div className="h-6 w-px bg-slate-200 mx-1 hidden md:block"></div>
+
+                  <button
+                    onClick={handleDownloadJson}
+                    className="hidden md:flex items-center gap-2 px-3 py-2 text-slate-500 hover:text-slate-900 font-medium text-sm hover:bg-slate-100 rounded-lg transition-all"
+                    title="Save Report JSON"
+                  >
+                     <Download className="w-4 h-4" /> Save
+                  </button>
+
+                  <button
+                    onClick={handlePrint}
+                    className="flex items-center gap-2 px-3 py-2 text-slate-500 hover:text-slate-900 font-medium text-sm hover:bg-slate-100 rounded-lg transition-all"
+                    title="Export PDF"
+                  >
+                     <Printer className="w-4 h-4" /> PDF
+                  </button>
+                  
+                  <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full border border-blue-100 text-xs font-bold ml-2">
+                    <Search className="w-3 h-3" />
+                    Verified
+                  </div>
+
                   <button 
                     onClick={() => setShowChat(!showChat)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
@@ -209,7 +254,7 @@ export default function App() {
                   <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <X className="w-10 h-10 text-red-600" />
                   </div>
-                  <h2 className="text-3xl font-bold text-slate-900 mb-3">Scan Terminated</h2>
+                  <h2 className="text-3xl font-bold text-slate-900 mb-3">Scan Failed</h2>
                   <p className="text-slate-600 mb-8 leading-relaxed">{errorMsg}</p>
                   <button 
                     onClick={() => setAppState(AppState.IDLE)}
@@ -300,7 +345,7 @@ export default function App() {
                 <div className="flex flex-col lg:flex-row gap-8">
                   
                   {/* Sidebar Nav */}
-                  <div className="w-full lg:w-72 flex-none space-y-3 sticky top-24 self-start">
+                  <div className="w-full lg:w-72 flex-none space-y-3 sticky top-24 self-start print:hidden">
                     <button 
                       onClick={() => setActiveTab('overview')}
                       className={`w-full text-left px-5 py-4 rounded-xl flex items-center justify-between transition-all group ${
@@ -323,6 +368,18 @@ export default function App() {
                     >
                       <span className="font-bold">SEO Keyword Parser</span>
                       <Tag className="w-4 h-4 opacity-50 group-hover:opacity-100" />
+                    </button>
+
+                    <button 
+                      onClick={() => setActiveTab('ads')}
+                      className={`w-full text-left px-5 py-4 rounded-xl flex items-center justify-between transition-all group ${
+                        activeTab === 'ads' 
+                            ? 'bg-orange-50 text-orange-600 border border-orange-200 shadow-sm' 
+                            : 'bg-white border border-slate-200 text-slate-500 hover:border-orange-200 hover:text-orange-600'
+                      }`}
+                    >
+                      <span className="font-bold">Ad Campaigns</span>
+                      <Megaphone className="w-4 h-4 opacity-50 group-hover:opacity-100" />
                     </button>
 
                     <button 
@@ -464,6 +521,10 @@ export default function App() {
                         </div>
                     )}
 
+                    {activeTab === 'ads' && (
+                        <AdGenerator url={report.targetUrl} keywords={report.keywords} />
+                    )}
+
                     {activeTab === 'roadmap' && (
                         <div className="animate-slideUp space-y-8">
                              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
@@ -510,7 +571,7 @@ export default function App() {
                     )}
 
                     {/* Individual Sections (Fallback for direct clicks) */}
-                    {activeTab !== 'overview' && activeTab !== 'keywords' && activeTab !== 'roadmap' && (
+                    {activeTab !== 'overview' && activeTab !== 'keywords' && activeTab !== 'roadmap' && activeTab !== 'ads' && (
                       <div className="space-y-6 animate-fadeIn">
                          {report.sections.filter(s => s.id === activeTab).map(section => (
                            <AuditSectionDetails key={section.id} section={section} />
@@ -528,7 +589,7 @@ export default function App() {
         <div 
             className={`fixed top-16 right-0 bottom-0 w-full md:w-[400px] z-40 transform transition-transform duration-300 ease-in-out ${
                 showChat && appState === AppState.COMPLETE ? 'translate-x-0' : 'translate-x-full'
-            }`}
+            } print:hidden`}
         >
             {report && (
                 <ChatInterface report={report} onClose={() => setShowChat(false)} />
@@ -539,7 +600,7 @@ export default function App() {
         {appState === AppState.COMPLETE && !showChat && (
              <button 
              onClick={() => setShowChat(true)}
-             className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full shadow-xl flex items-center justify-center text-white z-50 hover:scale-110 transition-transform"
+             className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full shadow-xl flex items-center justify-center text-white z-50 hover:scale-110 transition-transform print:hidden"
            >
              <MessageSquare className="w-7 h-7" />
            </button>
