@@ -27,15 +27,23 @@ export interface AuditSection {
   recommendations: Recommendation[];
 }
 
+export interface ContentStrategy {
+  topicClusters: string[];
+  blogTitles: string[]; // Low competition, informational
+}
+
 export interface AuditReport {
   targetUrl: string;
   overallScore: number;
+  nicheDetected: string; 
+  userPerception: string; 
   executiveSummary: string;
   quickWins: string[];
-  roiEstimate: RoiEstimate; // Added per PDF
-  implementationPlan: ImplementationStep[]; // Added per PDF
-  keywords: string[]; 
-  keyPhrases: string[]; 
+  roiEstimate: RoiEstimate; 
+  implementationPlan: ImplementationStep[]; 
+  keywords: string[]; // High intent, commercial
+  keyPhrases: string[]; // Keeping for backward compatibility or secondary topics
+  contentStrategy: ContentStrategy; // NEW: Specific content plan
   keywordStrategy: string; 
   sections: AuditSection[];
   scanDate: string;
