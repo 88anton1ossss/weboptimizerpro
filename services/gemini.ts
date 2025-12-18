@@ -82,7 +82,7 @@ Return ONLY valid JSON. The structure must match strictly:
 `;
 
 export const analyzeWebsite = async (url: string): Promise<AuditReport> => {
-  const model = 'gemini-2.5-flash'; 
+  const model = 'gemini-3-flash-preview'; 
 
   // Helper function to try generation with or without tools
   const generateAudit = async (useSearch: boolean) => {
@@ -166,7 +166,7 @@ export const analyzeWebsite = async (url: string): Promise<AuditReport> => {
 
 export const chatWithZaiper = async (message: string, reportContext: AuditReport, history: any[]) => {
   try {
-    const model = 'gemini-2.5-flash';
+    const model = 'gemini-3-flash-preview';
     
     // Response Scenario Architecture from PDF
     const systemPrompt = `You are Web Optimizer Pro Assistant.
@@ -211,7 +211,7 @@ export const chatWithZaiper = async (message: string, reportContext: AuditReport
 };
 
 export const generateAdCampaign = async (url: string, nicheKeywords: string[]): Promise<GoogleAd> => {
-    const model = 'gemini-2.5-flash';
+    const model = 'gemini-3-flash-preview';
     const prompt = `You are a Google Ads Specialist.
     Create a high-performing Search Ad Campaign for: ${url}.
     Context Keywords: ${nicheKeywords.slice(0, 10).join(', ')}.
