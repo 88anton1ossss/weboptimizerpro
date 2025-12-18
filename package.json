@@ -1,16 +1,15 @@
 {
   "name": "web-optimizer-pro",
   "version": "1.0.0",
-  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "start": "node dist/server.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "@google/genai": "^0.1.1",
+    "@google/generative-ai": "^0.2.0",
     "express": "^4.18.2",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",
@@ -18,7 +17,6 @@
     "recharts": "^2.12.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21",
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
