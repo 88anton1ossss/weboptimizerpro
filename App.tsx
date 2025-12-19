@@ -6,6 +6,7 @@ import AuditSectionDetails from './components/AuditSectionDetails';
 import RadialScore from './components/RadialScore';
 import ChatInterface from './components/ChatInterface';
 import AdGenerator from './components/AdGenerator';
+import { generatePDF } from './services/pdfGenerator';
 import { 
   ShieldCheck, 
   Search, 
@@ -93,7 +94,9 @@ export default function App() {
   };
 
   const handlePrint = () => {
-    window.print();
+    if (report) {
+      generatePDF(report);
+    }
   };
 
   const handleReset = () => {
@@ -156,7 +159,7 @@ export default function App() {
                     className="flex items-center gap-2 px-3 py-2 text-slate-500 hover:text-slate-900 font-medium text-sm hover:bg-slate-100 rounded-lg transition-all"
                     title="Export PDF"
                   >
-                     <Printer className="w-4 h-4" /> PDF
+                     <FileText className="w-4 h-4" /> Export PDF
                   </button>
                   
                   <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full border border-blue-100 text-xs font-bold ml-2">
