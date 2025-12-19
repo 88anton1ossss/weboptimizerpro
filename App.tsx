@@ -52,9 +52,22 @@ export default function App() {
     e.preventDefault();
     if (!url) return;
     
-    let formattedUrl = url;
+    // Basic cleaning
+    let formattedUrl = url.trim();
+    
+    // 1. Auto-prepend protocol if missing
     if (!/^https?:\/\//i.test(formattedUrl)) {
         formattedUrl = 'https://' + formattedUrl;
+    }
+
+    // 2. Robust Domain Validation Regex
+    // Matches: (http/s) + (subdomain.) + domain + .extension + (path)
+    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+
+    if (!urlPattern.test(formattedUrl)) {
+        setErrorMsg("Please enter a valid URL (e.g., apple.com or https://www.google.com)");
+        setAppState(AppState.ERROR);
+        return;
     }
 
     setAppState(AppState.SCANNING);
@@ -104,6 +117,7 @@ export default function App() {
       setReport(null);
       setUrl('');
       setActiveTab('overview');
+      setErrorMsg('');
   };
 
   const handleCopyKeywords = () => {
@@ -267,7 +281,7 @@ export default function App() {
                     onClick={() => setAppState(AppState.IDLE)}
                     className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-red-200"
                   >
-                    Return to Console
+                    Try Again
                   </button>
                 </div>
               </div>
