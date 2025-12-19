@@ -1,7 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 import { AuditReport, GoogleAd } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Safe initialization of the API key
+const apiKey = process.env.API_KEY;
+
+if (!apiKey) {
+  console.error("API_KEY is missing. Please ensure it is set in your environment variables or passed during the build.");
+}
+
+const ai = new GoogleGenAI({ apiKey: apiKey || 'DUMMY_KEY_TO_PREVENT_INIT_CRASH' });
 
 const SYSTEM_INSTRUCTION = `
 You are Web Optimizer Pro, an expert AI website auditor.
@@ -82,6 +89,10 @@ Return ONLY valid JSON. The structure must match strictly:
 `;
 
 export const analyzeWebsite = async (url: string): Promise<AuditReport> => {
+  if (!apiKey) {
+    throw new Error("System Configuration Error: API_KEY is missing. Please check the application settings.");
+  }
+  
   const model = 'gemini-3-flash-preview'; 
 
   // Helper function to try generation with or without tools
@@ -165,6 +176,8 @@ export const analyzeWebsite = async (url: string): Promise<AuditReport> => {
 };
 
 export const chatWithZaiper = async (message: string, reportContext: AuditReport, history: any[]) => {
+  if (!apiKey) throw new Error("API Key missing");
+
   try {
     const model = 'gemini-3-flash-preview';
     
@@ -211,6 +224,8 @@ export const chatWithZaiper = async (message: string, reportContext: AuditReport
 };
 
 export const generateAdCampaign = async (url: string, nicheKeywords: string[]): Promise<GoogleAd> => {
+    if (!apiKey) throw new Error("API Key missing");
+
     const model = 'gemini-3-flash-preview';
     const prompt = `You are a Google Ads Specialist.
     Create a high-performing Search Ad Campaign for: ${url}.
